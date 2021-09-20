@@ -2,13 +2,29 @@ import tarfile
 import re
 
 
+# PEP8に準拠するとimportが先頭に行くので苦肉の策
+while True:
+    import sys
+    sys.path.append("../000_mymodule/")
+    import logger
+    from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+    DEBUG_LEVEL = DEBUG
+    break
+
+
 class TarReader:
+    log = logger.Logger("TarReader", level=DEBUG_LEVEL)
 
     def __init__(self, file_main, file_compressed_1, file_compressed_2=None, mode="utf-8"):
         self.file_main = file_main
+        self.log.debug(self.file_main)
         self.file_compressed_1 = file_compressed_1
+        self.log.debug(self.file_compressed_1)
         self.file_compressed_2 = file_compressed_2
+        self.log.debug(self.file_compressed_2)
         self.mode = mode
+        self.log.debug(self.mode)
+
         self._tar = None
         self._tar1 = None
         self._tar2 = None
@@ -30,6 +46,7 @@ class TarReader:
 
         # tarファイル内から特定ファイルを読み出す
         for i in self._tar1.getmembers():
+            self.log.debug(i)
             if self.file_compressed_1 in i.name:
                 
                 self._tar2 = self._tar1.extractfile(i)
@@ -44,6 +61,7 @@ class TarReader:
                     self._tar3 = tarfile.open(fileobj=self._tar2)
 
                     for ii in self._tar3.getmembers():
+                        self.log.debug(ii)
                         if self.file_compressed_2 in ii.name:
                             
                             self._tar = self._tar3.extractfile(ii)
@@ -75,15 +93,14 @@ class TarReader:
         return result
 
 
-
 def main():
-    with TarReader("esd_xc.tgz", "prm.tgz", "systemcfg.xml") as t:
-        pattern2 = "<BlockId>.*</BlockId>"
-        for i in range(10):
-            print(t.readline()+"**")
-        #results2 = re.findall(pattern2, t.read())
-        #for i in results2:
-        #    print(i + "\n")
+    with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
+        result = t.readlines()
+
+    print(result)
+
+    for i in result:
+        print(i.decode("utf-8"))
 
 
 if __name__ == "__main__":
