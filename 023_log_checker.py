@@ -4,10 +4,11 @@ import re
 
 class TarReader:
 
-    def __init__(self, file_main, file_compressed_1, file_compressed_2=None):
+    def __init__(self, file_main, file_compressed_1, file_compressed_2=None, mode="utf-8"):
         self.file_main = file_main
         self.file_compressed_1 = file_compressed_1
         self.file_compressed_2 = file_compressed_2
+        self.mode = mode
         self._tar = None
         self._tar1 = None
         self._tar2 = None
@@ -61,12 +62,16 @@ class TarReader:
         self._tar2.close()
         self._tar1.close()
 
-    def read(self):
-        result = self._tar.read().decode("utf-8")
+    def read(self, size=-1):
+        result = self._tar.read(size).decode(self.mode)
         return result
 
     def readline(self):
-        result = self._tar.readline().rstrip().decode("utf-8")
+        result = self._tar.readline().rstrip().decode(self.mode)
+        return result
+
+    def readlines(self):
+        result = self._tar.readlines()
         return result
 
 
