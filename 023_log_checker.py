@@ -8,7 +8,7 @@ while True:
     sys.path.append("../000_mymodule/")
     import logger
     from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
-    DEBUG_LEVEL = DEBUG
+    DEBUG_LEVEL = INFO
     break
 
 
@@ -89,18 +89,32 @@ class TarReader:
         return result
 
     def readlines(self):
-        result = self._tar.readlines()
+        result = []
+        temp = self._tar.readlines()
+        for i in temp:
+            result.append(i.rstrip().decode(self.mode))
+
         return result
 
 
 def main():
+    # まとめて読み込む
+    with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
+        print(t.read())
+
+    # 10文字分を読み込む
+    with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
+        print(t.read(10))
+
+    # readlineで読み込む
+    with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
+        while (result := t.readline()):
+            print(result)
+    
+    # readlinesで読み込む
     with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
         result = t.readlines()
-
-    print(result)
-
-    for i in result:
-        print(i.decode("utf-8"))
+        print(result)
 
 
 if __name__ == "__main__":
