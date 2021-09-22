@@ -8,14 +8,29 @@ while True:
     sys.path.append("../000_mymodule/")
     import logger
     from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
-    DEBUG_LEVEL = INFO
+    DEBUG_LEVEL = WARNING
     break
 
 
 class TarReader:
+    """Easily read tar file without unzipping it.
+
+    Returns:
+        result: Contents of the read file.
+        result1: List of files in tar.
+        result2: List of files in tar which is in tar.
+    """
     log = logger.Logger("TarReader", level=DEBUG_LEVEL)
 
     def __init__(self, file_main, file_compressed_1=None, file_compressed_2=None, mode="utf-8"):
+        """Initialize TarReader class.
+
+        Args:
+            file_main (str): Tar's file name.
+            file_compressed_1 (str, optional): File name in Tar's file.
+            file_compressed_2 (str, optional): File name in file_compressed_1.
+            mode (str, optional): Encoding parameters. Defaults to "utf-8".
+        """
         self.file_main = file_main
         self.file_compressed_1 = file_compressed_1
         self.file_compressed_2 = file_compressed_2
@@ -27,13 +42,25 @@ class TarReader:
         self._tar3 = None
 
     def __enter__(self):
+        """For with command.
+        
+        """
         self.open()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """For with command.
+
+        Args:
+            exc_type: The exception type.
+            exc_value: The exception value.
+            traceback: The exception traceback information.
+        """
         self.close()
 
     def open(self):
+        """Open tar file.
+        """
         # 多重ループを抜けるため
         flag = False
 
@@ -68,6 +95,8 @@ class TarReader:
                 break
 
     def close(self):
+        """Close tar file.
+        """
         self._tar.close()
 
         # ネストされたファイルの有無確認
@@ -78,14 +107,32 @@ class TarReader:
         self._tar1.close()
 
     def read(self, size=-1):
+        """Same function as standard read command.
+
+        Args:
+            size (int, optional): Read file or read file to size if you want. Defaults to -1.
+
+        Returns:
+            string: Contents of file with decode.
+        """
         result = self._tar.read(size).decode(self.mode)
         return result
 
     def readline(self):
+        """Same function as standard readline command.
+
+        Returns:
+            string: One sentence of file with decode.
+        """
         result = self._tar.readline().rstrip().decode(self.mode)
         return result
 
     def readlines(self):
+        """Same function as standard readlines command.
+
+        Returns:
+            list: string: All sentences of file with decode.
+        """
         result = []
         temp = self._tar.readlines()
         for i in temp:
@@ -93,6 +140,11 @@ class TarReader:
         return result
 
     def getmembers(self):
+        """Get file name in tar file.
+
+        Returns:
+            list: file names
+        """
         self.log.info(f"file_main:{self.file_main}")
         self.log.info(f"file_compressed_1:{self.file_compressed_1}")
         self.log.info(f"file_compressed_2:{self.file_compressed_2}")
@@ -104,7 +156,6 @@ class TarReader:
 
         # tarファイル内がネストしているか確認する
         if self.file_compressed_1 is None:
-
             # ネストしていない場合
             for i in self._tar1.getmembers():
                 result1.append(i.name)
@@ -118,9 +169,7 @@ class TarReader:
         else:
             # ネストしている場合
             for i in self._tar1.getmembers():
-
                 result1.append(i.name)
-
                 if self.file_compressed_1 in i.name:
                     # ネストしているファイル内を読み込む
                     self._tar2 = self._tar1.extractfile(i)
@@ -144,20 +193,20 @@ class TarReader:
 def main():
     # 使い方の例
     # まとめて読み込む
-    with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
+    with TarReader("aaa.tgz", "a.txt") as t:
         print(t.read())
 
     # 10文字分を読み込む
-    with TarReader("aaa.tgz", "bbb.tgz", "c.txt") as t:
+    with TarReader("aaa.tgz", "b.txt") as t:
         print(t.read(10))
 
     # readlineで読み込む
-    with TarReader("aaa.tgz", "b.txt") as t:
+    with TarReader("aaa.tgz", "bbb.tgz", "c.txt") as t:
         while (result := t.readline()):
             print(result)
     
     # readlinesで読み込む
-    with TarReader("aaa.tgz", "a.txt", ) as t:
+    with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
         result = t.readlines()
         print(result)
 
