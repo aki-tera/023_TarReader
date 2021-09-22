@@ -131,7 +131,7 @@ class TarReader:
         """Same function as standard readlines command.
 
         Returns:
-            list: string: All sentences of file with decode.
+            list of string: All sentences of file with decode.
         """
         result = []
         temp = self._tar.readlines()
@@ -143,7 +143,7 @@ class TarReader:
         """Get file name in tar file.
 
         Returns:
-            list: file names
+            list of string: file names
         """
         self.log.info(f"file_main:{self.file_main}")
         self.log.info(f"file_compressed_1:{self.file_compressed_1}")
