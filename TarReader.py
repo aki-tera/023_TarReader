@@ -193,25 +193,25 @@ class TarReader:
 def main():
     # 使い方の例
     # まとめて読み込む
-    with TarReader("aaa.tgz", "a.txt") as t:
+    with TarReader("sample.tgz", "a.txt") as t:
         print(t.read())
 
     # 10文字分を読み込む
-    with TarReader("aaa.tgz", "b.txt") as t:
+    with TarReader("sample.tgz", "b.txt") as t:
         print(t.read(10))
 
     # readlineで読み込む
-    with TarReader("aaa.tgz", "bbb.tgz", "c.txt") as t:
+    with TarReader("sample.tgz", "bbb.tgz", "c.txt") as t:
         while (result := t.readline()):
             print(result)
     
     # readlinesで読み込む
-    with TarReader("aaa.tgz", "bbb.tgz", "d.txt") as t:
+    with TarReader("sample.tgz", "bbb.tgz", "d.txt") as t:
         result = t.readlines()
         print(result)
 
     # tar内のファイル一覧
-    result = TarReader("aaa.tgz", "bbb.tgz").getmembers()
+    result = TarReader("sample.tgz", "bbb.tgz").getmembers()
     print(result)
 
 
