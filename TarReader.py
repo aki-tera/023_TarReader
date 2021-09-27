@@ -1,15 +1,4 @@
 import tarfile
-import re
-
-
-# PEP8に準拠するとimportが先頭に行くので苦肉の策
-while True:
-    import sys
-    sys.path.append("../000_mymodule/")
-    import logger
-    from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
-    DEBUG_LEVEL = WARNING
-    break
 
 
 class TarReader:
@@ -20,7 +9,6 @@ class TarReader:
         result1: List of files in tar.
         result2: List of files in tar which is in tar.
     """
-    log = logger.Logger("TarReader", level=DEBUG_LEVEL)
 
     def __init__(self, file_main, file_compressed_1=None, file_compressed_2=None, mode="utf-8"):
         """Initialize TarReader class.
@@ -69,7 +57,7 @@ class TarReader:
 
         # tarファイル内から特定ファイルを読み出す
         for i in self._tar1.getmembers():
-            self.log.debug(i)
+            
             if self.file_compressed_1 in i.name:
                 
                 self._tar2 = self._tar1.extractfile(i)
@@ -84,8 +72,7 @@ class TarReader:
                     self._tar3 = tarfile.open(fileobj=self._tar2)
 
                     for ii in self._tar3.getmembers():
-
-                        self.log.debug(ii)
+                        
                         if self.file_compressed_2 in ii.name:
                             
                             self._tar = self._tar3.extractfile(ii)
@@ -145,9 +132,7 @@ class TarReader:
         Returns:
             list of string: file names
         """
-        self.log.info(f"file_main:{self.file_main}")
-        self.log.info(f"file_compressed_1:{self.file_compressed_1}")
-        self.log.info(f"file_compressed_2:{self.file_compressed_2}")
+
         result1 = []
         resutl2 = []
 
@@ -162,7 +147,6 @@ class TarReader:
 
             # 終了処理
             self._tar1.close()
-            self.log.info(f"result1:{result1}")
 
             return result1
 
@@ -182,9 +166,6 @@ class TarReader:
             self._tar3.close()
             self._tar2.close()
             self._tar1.close()
-
-            self.log.info(f"result1:{result1}")
-            self.log.info(f"result2:{resutl2}")
 
             # 2次元リストとして値を戻す
             return [result1, resutl2]
