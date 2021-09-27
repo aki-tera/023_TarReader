@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/compression-Tar-red)
 
 ## DEMO
-### Compressed files are cumbersome to handle. It's even more difficult if there are compressed files within those compressed files. Here is a good news for those who are in such trouble. With this python program, you can view the text inside a compressed file without decompressing the compressed file.
+### Compressed files are cumbersome to handle. It's even more difficult if there are compressed files within those compressed files. Here is a good news for those who are in such trouble. With this python program, you can view the text inside a compressed file `without decompressing the compressed file`.
 
 sample.tgz  
 　┣a.txt　　　　<-you can read!  
@@ -23,7 +23,7 @@ Tar file is `.tar` and `.tgz`, `.tar.tgz`, and others.
 
 ### specification
 - can use `read` and `readline`, `readlines`.
-- can list filenames in the compressed files and the compressed files in commpressed files.  
+- can get filenames in the compressed files and the compressed files in commpressed files.  
 
 
 ## Requirement 
@@ -34,9 +34,10 @@ Python 3
 
 ## Usage
 - At first, place this program in the same folder as the program you are creating.  
-- Next, please show following.
-<img src="https://user-images.githubusercontent.com/44888139/134872684-d5fccd1a-7550-4289-bcbd-20dc785635da.png" height="300px">  <img src="https://user-images.githubusercontent.com/44888139/134873452-38ca310a-f81c-4ebb-95f5-ea1968381b8c.png" height="300px">  
-<img src="https://user-images.githubusercontent.com/44888139/134872827-25b1cabd-155c-40c7-bb27-4eed6db59678.png" height="300px">  <img src="https://user-images.githubusercontent.com/44888139/134872873-89559e32-088d-4e4b-a665-0f64580917d8.png" height="300px">  
+- Next, please show following.  
+<img src="https://user-images.githubusercontent.com/44888139/134872684-d5fccd1a-7550-4289-bcbd-20dc785635da.png" height="285px">  <img src="https://user-images.githubusercontent.com/44888139/134873452-38ca310a-f81c-4ebb-95f5-ea1968381b8c.png" height="285px">  
+  
+<img src="https://user-images.githubusercontent.com/44888139/134872827-25b1cabd-155c-40c7-bb27-4eed6db59678.png" height="285px">  <img src="https://user-images.githubusercontent.com/44888139/134872873-89559e32-088d-4e4b-a665-0f64580917d8.png" height="285px">  
 
 
 ## License
@@ -47,8 +48,8 @@ This program is under MIT license.
 ## 機能
 圧縮ファイルのなかにある圧縮ファイルを解凍することなく読み取るプログラムです。
 - 仕様
-  - Tarファイルの中にあるテキストを読み取ります。
-  - TarファイルのさらにTarファイル内を読み取ることができます。
+  - tarファイルの中にあるテキストを読み取ります。
+  - tarファイルのさらにTarファイル内を読み取ることができます。
   - それらのファイル名を取得することができます。  
 
 ## 必要なもの
