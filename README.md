@@ -1,6 +1,6 @@
 # 023_TarReader
 ![](https://img.shields.io/badge/type-python3-brightgreen)  ![](https://img.shields.io/badge/windows%20build-passing-brightgreen) ![](https://img.shields.io/badge/license-MIT-brightgreen)   
-![](https://img.shields.io/badge/compression-Tar-red)
+![](https://img.shields.io/badge/compression-tar/tgz-red) ![](https://img.shields.io/badge/compression-zip-red)
 
 ## DEMO
 ### Compressed files are cumbersome to handle. It's even more difficult if there are compressed files within those compressed files. Here is a good news for those who are in such trouble. With this python program, you can view the text inside a compressed file `without decompressing the compressed file`.
@@ -18,8 +18,9 @@ sample.tgz
   
   
 ## Features
-You can view the text inside a tar file without decompressing the tar file.  
-Tar file is `.tar` and `.tgz`, `.tar.tgz`, and others.
+You can view the text inside a tar file(or zip file) without decompressing the tar file(or zip file).  
+Tar file is `.tar` and `.tgz`, `.tar.tgz`, and others.  
+Zip file is `.zip` without password.
 
 ### specification
 - can use `read` and `readline`, `readlines`.
@@ -34,6 +35,8 @@ Python 3
 
 ## Usage
 - At first, place this program in the same folder as the program you are creating.  
+- It is TarReader if you read tar file.
+  - It is ZipReader if you read zip file.
 - Next, please show following.  
   
 <img src="https://user-images.githubusercontent.com/44888139/134872684-d5fccd1a-7550-4289-bcbd-20dc785635da.png" height="285px">  <img src="https://user-images.githubusercontent.com/44888139/134873452-38ca310a-f81c-4ebb-95f5-ea1968381b8c.png" height="285px">  
@@ -49,8 +52,8 @@ This program is under MIT license.
 ## 機能
 圧縮ファイルのなかにある圧縮ファイルを解凍することなく読み取るプログラムです。
 - 仕様
-  - tarファイルの中にあるテキストを読み取ります。
-  - tarファイルのさらにtarファイル内を読み取ることができます。
+  - tarファイル(or zipファイル)の中にあるテキストを読み取ります。
+  - tarファイル(or zipファイル)のさらにtarファイル(or zipファイル)内を読み取ることができます。
   - それらのファイル名を取得することができます。  
 
 ## 必要なもの
@@ -59,8 +62,10 @@ Python 3
 
 ## 使い方
 1. まずこのプログラムを、あなたが作っているファイルと同じフォルダに置きます。
-1. あとは上にある絵を見て下さい。。
+1. tarファイルを読みたい場合はTarReaderを使います。
+   - zipファイルを読みたい場合はZipReaderを使います。
+1. あとは上にある絵を見て下さい。
 
 
 ## ライセンス
-本プログラムは、MITライセンスです
+本プログラムは、MITライセンスです。
