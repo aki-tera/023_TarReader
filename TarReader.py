@@ -7,28 +7,28 @@ class TarReader:
 
     Returns:
         result: Contents of the read file.
-        result1: List of files in tar.
-        result2: List of files in tar which is in tar.
+        file_name_array_1: List of files in tar.
+        file_name_array_2: List of files in tar which is in tar.
     """
 
-    def __init__(self, file_main, file_compressed_1=None, file_compressed_2=None, mode="utf-8"):
+    def __init__(self, target_file, file_compressed_1=None, file_compressed_2=None, coding_name="utf-8"):
         """Initialize TarReader class.
 
         Args:
-            file_main (str): Tar's file name.
+            target_file (str): Tar's file name.
             file_compressed_1 (str, optional): File name in Tar's file.
             file_compressed_2 (str, optional): File name in file_compressed_1.
-            mode (str, optional): Encoding parameters. Defaults to "utf-8".
+            coding_name (str, optional): Encoding parameters. Defaults to "utf-8".
         """
-        self.file_main = file_main
+        self.target_file = target_file
         self.file_compressed_1 = file_compressed_1
         self.file_compressed_2 = file_compressed_2
-        self.mode = mode
+        self.coding_name = coding_name
 
-        self._tar = None
-        self._tar1 = None
-        self._tar2 = None
-        self._tar3 = None
+        self.tar_object_1 = None
+        self.tar_object_2 = None
+        self.tar_object_3 = None
+        self.tar_object_target = None
 
     def __enter__(self):
         """For with command.
@@ -49,50 +49,51 @@ class TarReader:
 
     def open(self):
         """Open tar file.
+
         """
         # 多重ループを抜けるため
-        flag = False
+        is_break_loop = False
 
         # tarファイルの読み出し
-        self._tar1 = tarfile.open(self.file_main)
+        self.tar_object_1 = tarfile.open(self.target_file)
 
         # tarファイル内から特定ファイルを読み出す
-        for i in self._tar1.getmembers():
+        for i in self.tar_object_1.getmembers():
             
             if self.file_compressed_1 in i.name:
                 
-                self._tar2 = self._tar1.extractfile(i)
+                self.tar_object_2 = self.tar_object_1.extractfile(i)
 
                 # ネストされたファイルの有無で分岐
                 if self.file_compressed_2 is None:
                     
-                    self._tar = self._tar2
-                    flag = True
+                    self.tar_object_target = self.tar_object_2
+                    is_break_loop = True
                 else:
                     
-                    self._tar3 = tarfile.open(fileobj=self._tar2)
+                    self.tar_object_3 = tarfile.open(fileobj=self.tar_object_2)
 
-                    for ii in self._tar3.getmembers():
+                    for ii in self.tar_object_3.getmembers():
                         
                         if self.file_compressed_2 in ii.name:
                             
-                            self._tar = self._tar3.extractfile(ii)
-                            flag = True
+                            self.tar_object_target = self.tar_object_3.extractfile(ii)
+                            is_break_loop = True
                             break
-            if flag:
+            if is_break_loop:
                 break
 
     def close(self):
         """Close tar file.
         """
-        self._tar.close()
+        self.tar_object_target.close()
 
         # ネストされたファイルの有無確認
         if self.file_compressed_2 is not None:
-            self._tar3.close()
+            self.tar_object_3.close()
 
-        self._tar2.close()
-        self._tar1.close()
+        self.tar_object_2.close()
+        self.tar_object_1.close()
 
     def read(self, size=-1):
         """Same function as standard read command.
@@ -103,28 +104,28 @@ class TarReader:
         Returns:
             string: Contents of file with decode.
         """
-        result = self._tar.read(size).decode(self.mode)
+        result = self.tar_object_target.read(size).decode(self.coding_name)
         return result
 
-    def readline(self):
+    def readline(self, size=-1):
         """Same function as standard readline command.
 
         Returns:
             string: One sentence of file with decode.
         """
-        result = self._tar.readline().rstrip().decode(self.mode)
+        result = self.tar_object_target.readline(size).rstrip().decode(self.coding_name)
         return result
 
-    def readlines(self):
+    def readlines(self, hint=-1):
         """Same function as standard readlines command.
 
         Returns:
             list of string: All sentences of file with decode.
         """
         result = []
-        temp = self._tar.readlines()
+        temp = self.tar_object_target.readlines(hint)
         for i in temp:
-            result.append(i.rstrip().decode(self.mode))
+            result.append(i.rstrip().decode(self.coding_name))
         return result
 
     def getmembers(self):
@@ -134,42 +135,42 @@ class TarReader:
             list of string: file names
         """
 
-        result1 = []
-        resutl2 = []
+        file_name_array_1 = []
+        file_name_array_2 = []
 
         # tarファイルの読み出し
-        self._tar1 = tarfile.open(self.file_main)
+        self.tar_object_1 = tarfile.open(self.target_file)
 
         # tarファイル内がネストしているか確認する
         if self.file_compressed_1 is None:
             # ネストしていない場合
-            for i in self._tar1.getmembers():
-                result1.append(i.name)
+            for i in self.tar_object_1.getmembers():
+                file_name_array_1.append(i.name)
 
             # 終了処理
-            self._tar1.close()
+            self.tar_object_1.close()
 
-            return result1
+            return file_name_array_1
 
         else:
             # ネストしている場合
-            for i in self._tar1.getmembers():
-                result1.append(i.name)
+            for i in self.tar_object_1.getmembers():
+                file_name_array_1.append(i.name)
                 if self.file_compressed_1 in i.name:
                     # ネストしているファイル内を読み込む
-                    self._tar2 = self._tar1.extractfile(i)
-                    self._tar3 = tarfile.open(fileobj=self._tar2)
+                    self.tar_object_2 = self.tar_object_1.extractfile(i)
+                    self.tar_object_3 = tarfile.open(fileobj=self.tar_object_2)
 
-                    for ii in self._tar3.getmembers():
-                        resutl2.append(ii.name)
+                    for ii in self.tar_object_3.getmembers():
+                        file_name_array_2.append(ii.name)
 
             # 終了処理
-            self._tar3.close()
-            self._tar2.close()
-            self._tar1.close()
+            self.tar_object_3.close()
+            self.tar_object_2.close()
+            self.tar_object_1.close()
 
             # 2次元リストとして値を戻す
-            return [result1, resutl2]
+            return [file_name_array_1, file_name_array_2]
 
 
 class ZipReader:
@@ -177,28 +178,28 @@ class ZipReader:
 
     Returns:
         result: Contents of the read file.
-        result1: List of files in zip.
-        result2: List of files in zip which is in zip.
+        file_name_array_1: List of files in zip.
+        file_name_array_2: List of files in zip which is in zip.
     """
 
-    def __init__(self, file_main, file_compressed_1=None, file_compressed_2=None, mode="utf-8"):
+    def __init__(self, target_file, file_compressed_1=None, file_compressed_2=None, coding_name="utf-8"):
         """Initialize ZipReader class.
 
         Args:
-            file_main (str): zip's file name.
+            target_file (str): zip's file name.
             file_compressed_1 (str, optional): File name in zip's file.
             file_compressed_2 (str, optional): File name in file_compressed_1.
-            mode (str, optional): Encoding parameters. Defaults to "utf-8".
+            coding_name (str, optional): Encoding parameters. Defaults to "utf-8".
         """
-        self.file_main = file_main
+        self.target_file = target_file
         self.file_compressed_1 = file_compressed_1
         self.file_compressed_2 = file_compressed_2
-        self.mode = mode
+        self.coding_name = coding_name
 
-        self._zip = None
-        self._zip1 = None
-        self._zip2 = None
-        self._zip3 = None
+        self.zip_object_1 = None
+        self.zip_object_2 = None
+        self.zip_object_3 = None
+        self.zip_object_target = None
 
     def __enter__(self):
         """For with command.
@@ -219,50 +220,52 @@ class ZipReader:
 
     def open(self):
         """Open tar file.
+
         """
         # 多重ループを抜けるため
-        flag = False
+        is_break_loop = False
 
         # zipファイルの読み出し
-        self._zip1 = zipfile.ZipFile(self.file_main)
+        self.zip_object_1 = zipfile.ZipFile(self.target_file)
 
         # zipファイル内から特定ファイルを読み出す
-        for i in self._zip1.infolist():
+        for i in self.zip_object_1.infolist():
             
             if self.file_compressed_1 in i.filename:
                 
-                self._zip2 = self._zip1.open(i.filename)
+                self.zip_object_2 = self.zip_object_1.open(i.filename)
 
                 # ネストされたファイルの有無で分岐
                 if self.file_compressed_2 is None:
                     
-                    self._zip = self._zip2
-                    flag = True
+                    self.zip_object_target = self.zip_object_2
+                    is_break_loop = True
                 else:
                     
-                    self._zip3 = zipfile.ZipFile(self._zip2)
+                    self.zip_object_3 = zipfile.ZipFile(self.zip_object_2)
 
-                    for ii in self._zip3.infolist():
+                    for ii in self.zip_object_3.infolist():
                         
                         if self.file_compressed_2 in ii.filename:
                             
-                            self._zip = self._zip3.open(ii.filename)
-                            flag = True
+                            self.zip_object_target = self.zip_object_3.open(ii.filename)
+                            is_break_loop = True
                             break
-            if flag:
+            if is_break_loop:
                 break
 
     def close(self):
         """Close zip file.
+        
         """
-        self._zip.close()
+        self.zip_object_target.close()
 
         # ネストされたファイルの有無確認
         if self.file_compressed_2 is not None:
-            self._zip3.close()
+            self.zip_object_3.close()
 
-        self._zip2.close()
-        self._zip1.close()
+        self.zip_object_2.close()
+        self.zip_object_1.close()
 
     def read(self, size=-1):
         """Same function as standard read command.
@@ -273,28 +276,28 @@ class ZipReader:
         Returns:
             string: Contents of file with decode.
         """
-        result = self._zip.read(size).decode(self.mode)
+        result = self.zip_object_target.read(size).decode(self.coding_name)
         return result
 
-    def readline(self):
+    def readline(self, size=-1):
         """Same function as standard readline command.
 
         Returns:
             string: One sentence of file with decode.
         """
-        result = self._zip.readline().rstrip().decode(self.mode)
+        result = self.zip_object_target.readline(size).rstrip().decode(self.coding_name)
         return result
 
-    def readlines(self):
+    def readlines(self, hint=-1):
         """Same function as standard readlines command.
 
         Returns:
             list of string: All sentences of file with decode.
         """
         result = []
-        temp = self._zip.readlines()
+        temp = self.zip_object_target.readlines(hint)
         for i in temp:
-            result.append(i.rstrip().decode(self.mode))
+            result.append(i.rstrip().decode(self.coding_name))
         return result
 
     def getmembers(self):
@@ -304,42 +307,42 @@ class ZipReader:
             list of string: file names
         """
 
-        result1 = []
-        resutl2 = []
+        file_name_array_1 = []
+        file_name_array_2 = []
 
         # tarファイルの読み出し
-        self._zip1 = zipfile.ZipFile(self.file_main)
+        self.zip_object_1 = zipfile.ZipFile(self.target_file)
 
         # tarファイル内がネストしているか確認する
         if self.file_compressed_1 is None:
             # ネストしていない場合
-            for i in self._zip1.infolist():
-                result1.append(i.filename)
+            for i in self.zip_object_1.infolist():
+                file_name_array_1.append(i.filename)
 
             # 終了処理
-            self._zip1.close()
+            self.zip_object_1.close()
 
-            return result1
+            return file_name_array_1
 
         else:
             # ネストしている場合
-            for i in self._zip1.infolist():
-                result1.append(i.filename)
+            for i in self.zip_object_1.infolist():
+                file_name_array_1.append(i.filename)
                 if self.file_compressed_1 in i.filename:
                     # ネストしているファイル内を読み込む
-                    self._zip2 = self._zip1.open(i.filename)
-                    self._zip3 = zipfile.ZipFile(self._zip2)
+                    self.zip_object_2 = self.zip_object_1.open(i.filename)
+                    self.zip_object_3 = zipfile.ZipFile(self.zip_object_2)
 
-                    for ii in self._zip3.infolist():
-                        resutl2.append(ii.filename)
+                    for ii in self.zip_object_3.infolist():
+                        file_name_array_2.append(ii.filename)
 
             # 終了処理
-            self._zip3.close()
-            self._zip2.close()
-            self._zip1.close()
+            self.zip_object_3.close()
+            self.zip_object_2.close()
+            self.zip_object_1.close()
 
             # 2次元リストとして値を戻す
-            return [result1, resutl2]
+            return [file_name_array_1, file_name_array_2]
 
 
 def main():
